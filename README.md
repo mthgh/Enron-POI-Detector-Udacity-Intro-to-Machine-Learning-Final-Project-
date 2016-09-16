@@ -243,6 +243,8 @@ classifier   accuracy   precision   recall       f1         f2
  CLF2         0.846      0.541      0.495      0.517      0.504   
 </pre>
 ## 7. Testing
+see code in ```final_test.py```
+
 In order to test the selected feature (sf3) and classifiers (CLF1, CLF2), the whole training set was trained by CLF1 or CLF2. After conducting predictions on the testing set, accuracy, precision, recall and f1 were obtained. The scores were shown below.
 <pre>
 sf3:
