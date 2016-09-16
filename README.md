@@ -189,4 +189,74 @@ Several conclusions could be drawn from the above classifier screening. (1) sf2 
 
 Based on the result, AdaBoostClassifier was choosen for further tuning. AdaBoost is an ensembled method works by fitting a sequence of weak learners on repeatedly modified versions of the data. While random forest works good for complex systems to reduce variance, AdaBoost usually works well on weak systems to reduce bias. Considering the small amount of samples in Enron dataset and the highly skewed class, AdaBoost seems like a good choice. Also, AdaBoost performs good in initial screeening of algorithms.
 
-The parameters tuned in AdaBoostClassifier are 'base_estimator' and 'n_estimators'. 'n_estimators' with value 30, 50, 80 and 100 were evaluated. 'base_estimator' with value 'None' and 'DecisionTreeClassifier' were choosen
+The parameters tuned in AdaBoostClassifier are 'base_estimator' and 'n_estimators'. 'n_estimators' with value 30, 50, 80 and 100 were evaluated. 'base_estimator' with value 'None' and 'DecisionTreeClassifier' were evaluated, since 'DecisionTreeClassifier' itself gives good result. Furthermore, "min_samples_split" and "max_features" in 'DecisionTreeClassifier' were evaluated with value 2, 5, 8, and 0.5, 0.8, 1.0, respectively. The evaluation method used is still the cross validation method talked above. Classifiers which give the best accuracy, best precision, best recall, best f1 and best f2 were obtained as below.
+<pre>
+AdaBoost Tuning:
+
+Note: if 'min_samples_split' and 'max_featues' are None, base_estimator = None.
+Else, base_estimator = DecisionTreeClassifier(min_samples_split = min_samples_split, 
+max_features = max_features)
+
+                   n_estimator   min_samples_split  max_features   accuracy   precision   recall       f1         f2     
+  best_accuracy         80             None            None         0.854      0.607      0.355      0.448      0.387   
+ best_precision         80             None            None         0.854      0.607      0.355      0.448      0.387   
+   best_recall         100              2              0.8          0.846      0.541      0.495      0.517      0.504   
+     best_f1           100              2              0.8          0.846      0.541      0.495      0.517      0.504   
+     best_f2           100              2              0.8          0.846      0.541      0.495      0.517      0.504   
+</pre>
+From the result above, two classifiers were selected. One gives best accuracy and precision, using base_estimator=None, n_estimators = 80 (CLF1).The other classifier gives best recall, f1 and f2, using base_estimator = DecisionTreeClassifier(min_samples_split = 2, 
+max_features = 0.8), n_estimators = 100 (CLF2). 
+
+PCA were also used on sf3 and CLF2 to check via cross validation to see if better result could be obtained. number of components from 1 to 5 were tested. The results were list below. Compared with CLF2 without PCA, inferior results were obtianed.
+<pre>
+PCA Analysis:
+
+CLF2: AdaBoostClassifier(algorithm='SAMME.R',
+          base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+            max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            presort=False, random_state=42, splitter='best'),
+          learning_rate=1.0, n_estimators=100, random_state=42) 
+
+ n_components    accuracy   precision     recall        f1          f2     
+       1          0.829       0.484       0.385       0.429       0.401    
+       2          0.828       0.479       0.400       0.436       0.414    
+       3          0.805       0.384       0.280       0.324       0.296    
+       4          0.818       0.446       0.370       0.404       0.383    
+       5          0.809       0.408       0.320       0.359       0.334   
+</pre>
+
+After all the tests, two best classifiers were selected, they are CLF1 and CLF2 from AdaBoost tuning, the features used were sf3. To make it clear, the features used, classifier parameters and cross validation scores were listed below for one more time. The features and classifiers were saved in 'final_clfs_features.pkl'
+<pre>
+sf3:
+"poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options", "total_stock_value" ("poi" is the label)
+CLF1:
+AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0, n_estimators=80, random_state=None)
+CLF2:
+AdaBoostClassifier(algorithm='SAMME.R', base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None, max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, presort=False, random_state=42, splitter='best'), learning_rate=1.0, n_estimators=100, random_state=42)
+
+classifier   accuracy   precision   recall       f1         f2     
+ CLF1         0.854      0.607      0.355      0.448      0.387   
+ CLF2         0.846      0.541      0.495      0.517      0.504   
+</pre>
+## 7. Testing
+In order to test the selected feature (sf3) and classifiers (CLF1, CLF2), the whole training set was trained by CLF1 or CLF2. After conducting predictions on the testing set, accuracy, precision, recall and f1 were obtained. The scores were shown below.
+<pre>
+sf3:
+"poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options", "total_stock_value" ("poi" is the label)
+CLF1:
+AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0, n_estimators=80, random_state=None)
+CLF2:
+AdaBoostClassifier(algorithm='SAMME.R', base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None, max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, presort=False, random_state=42, splitter='best'), learning_rate=1.0, n_estimators=100, random_state=42)
+
+Results on testing set:
+ clf   accuracy   precision     recall        f1     
+CLF1    0.769       0.333       0.500       0.400    
+CLF2    0.731       0.286       0.500       0.364    
+</pre>
+
+Compared with cross validation score, the scores for testing set are all slightly lower. This is expected, since for a good fit, testing error would be slightly higher than the training error.
+## 8. Conclusion
+In conclusion, sf3 and CLF1/CLF2 were used as features and classifiers respectively for POI detection. CLF1 is slightly better than CLF2, with accuracy equals 0.769, precision equals 0.333, recall equals 0.5 and f1 equals 0.4. This means using this POI identifier, if a person is real POI, there are only 50% chance that this identifier will recognize him or her. And if this identifier recognize a person to be POI, there are only 33% chance that this person is really a POI. Although the accuracy is not too bad (77%), this doesn't mean much for a highly skewed classification (much less POI compared with non-POI).
+
+The low efficiency are mostly due to limited samples and highly skewed class. There are about 140 samples with only less than 15% of people being POI, with this small amount of data, it tend to underfit. The train-test splitting is also challenging because there is a trade off between training error and testing error. Furthermore, the financial data is not completed, with a large amount of missing values. Last but not least, this dataset is not likely to be representative for all Enron employees. Since this dataset comes from top excutives in Enron, their financial status would be very different from regular Enron employees, and it is very likely that the percentage of POI from top excutives would be much higher than the percentage of POI from regular employees.
