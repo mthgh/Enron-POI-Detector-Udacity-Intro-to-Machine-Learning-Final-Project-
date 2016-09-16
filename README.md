@@ -58,9 +58,11 @@ Number of missing values for each feature in dataset:
  'total_payments': 21,
  'total_stock_value': 20}
 </pre>
-To check for outliers in financial data, all financial features were extracted from the dataset. Using dimension reduction (PCA), the multidimensional financial features were projected to two dimensions and the mapping was visualized (Figure 1).   
+To check for outliers in financial data, all financial features were extracted from the dataset. Using dimension reduction (PCA), the multidimensional financial features were projected to two dimensions and the mapping was visualized (Fig 1). 
+![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_1.png)
 This visualization clearly indicate two outliers. A further exploration of the outliers revealed one is from "TOTAL" and the other is from financial data of "LAY KENNETH L". The formal outlier was removed as it was not a valid data point, whereas the latter was kept because it is a valid input, and it is actually coming from a "POI"  
-After removing the invalid data point, the outlier checking process was repeated (extract all financial features and apply PCA to project to two dimensions) and several more outliers were observed (Figure 2), the new outliers were all valid financial data from 'HIRKO JOSEPH', 'RICE KENNETH D', 'SKILLING JEFFREY K' and 'PAI LOU L'. Therefore they are kept without change.  
+After removing the invalid data point, the outlier checking process was repeated (extract all financial features and apply PCA to project to two dimensions) and several more outliers were observed (Fig 2), the new outliers were all valid financial data from 'HIRKO JOSEPH', 'RICE KENNETH D', 'SKILLING JEFFREY K' and 'PAI LOU L'. Therefore they are kept without change.
+![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_2.png)
 The modified dataset were dumped into ```enron_dataset_modify.pkl```
 ## 5. Feature Selection
 ```feature_selection.py``` was used to select features used for POI identifier. 
@@ -116,7 +118,7 @@ Based on the above ANOVA tests, features which have P level below 1% were select
 
 sf1 = ["poi", "total_stock_value", "exercised_stock_options", "bonus", "restricted_stock", "salary", "shared_receipt_with_poi", "total_payments", "expenses"] ("poi" is the label)
 
-Nevertheless, ANOVA test considers all features independent, while in reality, features could have interactions with each other. Therefore, recursive feature elimination (RFE) was used to do feature selection. Specifically, random forest classifier was used to do the selection since it is robust (not necessarily to be the final algorithm). RFE was used with cross validation to rank features and select the optimized number of features. The f1 score was used as scoring strategy in cross validation. The RFECV was also nested with GridSearchCV to optimize some of the parameters in random forest classifier. The feature ranking was shown below. The cross validation score vs number of feature selected was also shown in Figure 3.
+Nevertheless, ANOVA test considers all features independent, while in reality, features could have interactions with each other. Therefore, recursive feature elimination (RFE) was used to do feature selection. Specifically, random forest classifier was used to do the selection since it is robust (not necessarily to be the final algorithm). RFE was used with cross validation to rank features and select the optimized number of features. The f1 score was used as scoring strategy in cross validation. The RFECV was also nested with GridSearchCV to optimize some of the parameters in random forest classifier. The feature ranking was shown below. The cross validation score vs number of feature selected was also shown in Fig 3.
 <pre>
 Feature Ranking from RFECV nested with GridSearchCV:
 
@@ -136,6 +138,7 @@ Feature Ranking from RFECV nested with GridSearchCV:
            from_this_person_to_poi         11
   fraction_from_this_person_to_poi         12
 </pre>
+![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_3.png)
 The optimized number of features is 4, they are "bonus", "exercised_stock_options", "expenses" and "from_poi_to_this_person". Among the four features, the first three also have high F-score in ANOVA test, whereas the last one didn't rank high in ANOVA test. This suggest a interaction between "from_poi_to_this_person" and other features, leading to an increased importance. Based on the RFECV reault, the first 4 features were selected for further test. 
 
 sf2 = ["poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options"] ("poi" is the label)
