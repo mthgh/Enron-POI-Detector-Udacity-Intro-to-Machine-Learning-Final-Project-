@@ -5,7 +5,7 @@ In 2000, Enron was one of the largest companies in the United States. By 2002, i
 
 ## 2. References
 * Enron email dataset: "https://www.cs.cmu.edu/~./enron/enron_mail_20150507.tgz"
-* Enron insiderpay(financial data for top excutives at Enron): enron61702insiderpay.pdf
+* Enron insiderpay(financial data for top executives at Enron): enron61702insiderpay.pdf
 * Udacity's Intro to Machine Learning Course 
 
 ## 3. Resources from Udacity Course Material (preprocessing details)
@@ -71,7 +71,7 @@ Before conducting feature selection, the financial data (from 'enron_dataset_mod
 
 First, irrelevant feature "email_address" was unselected. Features which have more than 50% of missing values were removed. After the two steps, there are 13 features left over. 
 
-Second, a ANOVA test was used to rank the 13 features left over. The F-score and P-value were listed below. From the result, for email features, other then "shared_receipt_with_poi", most of them have very small F-score, meaning they are irrelevant to poi. Considering the "from_this_person_to_poi" and "from_poi_to_this_person" didn't take all "from_messages" and "to_messages" into account, two new features "fraction_from_this_person_to_poi" and "fraction_from_poi_to_this_person" were added and saved to 'enron_dataset_train_modify.pkl'.
+Second, an ANOVA test was used to rank the 13 features left over. The F-score and P-value were listed below. From the result, for email features, other than "shared_receipt_with_poi", most of them have very small F-score, meaning they are irrelevant to poi. Considering the "from_this_person_to_poi" and "from_poi_to_this_person" didn't take all "from_messages" and "to_messages" into account, two new features "fraction_from_this_person_to_poi" and "fraction_from_poi_to_this_person" were added and saved to 'enron_dataset_train_modify.pkl'.
 <pre>
 First Time ANOVA Test:
 
@@ -91,7 +91,7 @@ First Time ANOVA Test:
                  total_stock_value     26.598      0.000
 </pre>
 
-After addition of the two new features, ANOVA test was conducted again. The reaults were listed below. Clearly, the two new added features still rank pretty low.
+After addition of the two new features, ANOVA test was conducted again. The results were listed below. Clearly, the two new added features still rank pretty low.
 
 <pre>
 Second Time ANOVA Test:
@@ -116,7 +116,7 @@ Second Time ANOVA Test:
 
 Based on the above ANOVA tests, features which have P level below 1% were selected as candidates for further algorithm selection.
 
-sf1 = ["poi", "total_stock_value", "exercised_stock_options", "bonus", "restricted_stock", "salary", "shared_receipt_with_poi", "total_payments", "expenses"] ("poi" is the label)
+sf1 = \["poi", "total_stock_value", "exercised_stock_options", "bonus", "restricted_stock", "salary", "shared_receipt_with_poi", "total_payments", "expenses"\] ("poi" is the label)
 
 Nevertheless, ANOVA test considers all features independent, while in reality, features could have interactions with each other. Therefore, recursive feature elimination (RFE) was used to do feature selection. Specifically, random forest classifier was used to do the selection since it is robust (not necessarily to be the final algorithm). RFE was used with cross validation to rank features and select the optimized number of features. The f1 score was used as scoring strategy in cross validation. The RFECV was also nested with GridSearchCV to optimize some of the parameters in random forest classifier. The feature ranking was shown below. The cross validation score vs number of feature selected was also shown below (saved to 'figure_3.png').
 <pre>
@@ -139,13 +139,13 @@ Feature Ranking from RFECV nested with GridSearchCV:
   fraction_from_this_person_to_poi         12
 </pre>
 ![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_3.png)
-The optimized number of features is 4, they are "bonus", "exercised_stock_options", "expenses" and "from_poi_to_this_person". Among the four features, the first three also have high F-score in ANOVA test, whereas the last one didn't rank high in ANOVA test. This suggest a interaction between "from_poi_to_this_person" and other features, leading to an increased importance. Based on the RFECV reault, the first 4 features were selected for further test. 
+The optimized number of features is 4, they are "bonus", "exercised_stock_options", "expenses" and "from_poi_to_this_person". Among the four features, the first three also have high F-score in ANOVA test, whereas the last one didn't rank high in ANOVA test. This suggest an interaction between "from_poi_to_this_person" and other features, leading to an increased importance. Based on the RFECV reault, the first 4 features were selected for further test. 
 
-sf2 = ["poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options"] ("poi" is the label)
+sf2 = \["poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options"\] ("poi" is the label)
 
 Also, another combination of features were selected by combining sf2 and the top features in sf1 ("total_stock_value", "exercised_stock_options", "bonus"). (several different combinations were tested, this one proven to be most effecient.)
 
-sf3 = ["poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options", "total_stock_value"] ("poi" is the label)
+sf3 = \["poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options", "total_stock_value"\] ("poi" is the label)
 
 The three different combinations of features (sf1, sf2, sf3) were saved to 'initial_three_combinations_of_features.pkl' for further testing on algorithm.
 ## 6. Algorithm Selection
@@ -186,11 +186,11 @@ Screening Different Classifiers:
    DecisionTreeClassifier()       sf1        0.858       0.246       0.340       0.286       0.316    
 ----------------------------------------------------------------------------------------------------
 </pre>
-Note that both f1 and f2 were calculated, with f1 measure the balance between precision and recall and f2 weighs recall higher than precision. In this specific POI identifier, we would like to weigh recall higher than precsion, because we want to be able to identify all real POIs, even if the sacrifice is that we might identify some innocent people as POI (because we will always further check on them to see if they commited crime). The bottom line is that we don't want to miss any real POIs as innocent people. That's why we care about f2 score.
+Note that both f1 and f2 were calculated, with f1 measure the balance between precision and recall and f2 weighs recall higher than precision. In this specific POI identifier, we would like to weigh recall higher than precision, because we want to be able to identify all real POIs, even if the sacrifice is that we might identify some innocent people as POI (because we will always further check on them to see if they committed crime). The bottom line is that we don't want to miss any real POIs as innocent people. That's why we care about f2 score.
 
-Several conclusions could be drawn from the above classifier screening. (1) sf2 and sf3 perform better than sf1 in almost all cases. sf3 is slightly better than sf2 in many cases. (2) GaussianNB, AdaBoostClassifier and DecisionTreeClassifier perform better than other three classifiers in that they give all scores better than 0.3. (3) SVC and KNN are inferior than others, giving low precision, recall, f1 and f2 in most cases. Although the best precision was obtained from combination of SVC and sf3 (precision=1), the recall is pretty low (recall=0.005), meaning FP=0 (precision=TP/(TP+FP)=1), but FN is much larger than TP (recall=TP/(TP+FN)=0.005, FN=199TP). In another word, in this algorithm, almost all real POI were identified as non-POI. It is not a effective algorithm at all. (4) it could be noted that in all cases, the accuracy is high (larger than 0.8), that doesn't mean the algorithm is good, because accuracy is not a very effective measure for skewed classification (much smaller number of POI than non-POI).
+Several conclusions could be drawn from the above classifier screening. (1) sf2 and sf3 perform better than sf1 in almost all cases. sf3 is slightly better than sf2 in many cases. (2) GaussianNB, AdaBoostClassifier and DecisionTreeClassifier perform better than other three classifiers in that they give all scores better than 0.3. (3) SVC and KNN are inferior to others, giving low precision, recall, f1 and f2 in most cases. Although the best precision was obtained from combination of SVC and sf3 (precision=1), the recall is pretty low (recall=0.005), meaning FP=0 (precision=TP/(TP+FP)=1), but FN is much larger than TP (recall=TP/(TP+FN)=0.005, FN=199TP). In another word, in this algorithm, almost all real POI were identified as non-POI. It is not a effective algorithm at all. (4) it could be noted that in all cases, the accuracy is high (larger than 0.8), that doesn't mean the algorithm is good, because accuracy is not a very effective measure for skewed classification (much smaller number of POI than non-POI).
 
-Based on the result, AdaBoostClassifier was choosen for further tuning. AdaBoost is an ensembled method works by fitting a sequence of weak learners on repeatedly modified versions of the data. While random forest works good for complex systems to reduce variance, AdaBoost usually works well on weak systems to reduce bias. Considering the small amount of samples in Enron dataset and the highly skewed class, AdaBoost seems like a good choice. Also, AdaBoost performs good in initial screeening of algorithms.
+Based on the result, AdaBoostClassifier was chosen for further tuning. AdaBoost is an ensemble method works by fitting a sequence of weak learners on repeatedly modified versions of the data. While random forest works well for complex systems to reduce variance, AdaBoost usually works well on weak systems to reduce bias. Considering the small amount of samples in Enron dataset and the highly skewed class, AdaBoost seems like a good choice. Also, AdaBoost performs well in initial screening of algorithms.
 
 The parameters tuned in AdaBoostClassifier are 'base_estimator' and 'n_estimators'. 'n_estimators' with value 30, 50, 80 and 100 were evaluated. 'base_estimator' with value 'None' and 'DecisionTreeClassifier' were evaluated, since 'DecisionTreeClassifier' itself gives good result. Furthermore, "min_samples_split" and "max_features" in 'DecisionTreeClassifier' were evaluated with value 2, 5, 8, and 0.5, 0.8, 1.0, respectively. The evaluation method used is still the cross validation method talked above. Classifiers which give the best accuracy, best precision, best recall, best f1 and best f2 were obtained as below.
 <pre>
@@ -210,7 +210,7 @@ max_features = max_features)
 From the result above, two classifiers were selected. One gives best accuracy and precision, using base_estimator=None, n_estimators = 80 (CLF1).The other classifier gives best recall, f1 and f2, using base_estimator = DecisionTreeClassifier(min_samples_split = 2, 
 max_features = 0.8), n_estimators = 100 (CLF2). 
 
-PCA were also used on sf3 and CLF2 to check via cross validation to see if better result could be obtained. number of components from 1 to 5 were tested. The results were list below. Compared with CLF2 without PCA, inferior results were obtianed.
+PCA were also used on sf3 and CLF2 to check via cross validation to see if better result could be obtained. Number of components from 1 to 5 were tested. The results were list below. Compared with CLF2 without PCA, inferior results were obtianed.
 <pre>
 PCA Analysis:
 
@@ -266,4 +266,4 @@ Compared with cross validation score, the scores for testing set are all slightl
 ## 8. Conclusion
 In conclusion, sf3 and CLF1/CLF2 were used as features and classifiers respectively for POI detection. CLF1 is slightly better than CLF2, with accuracy equals 0.769, precision equals 0.333, recall equals 0.5 and f1 equals 0.4. This means using this POI identifier, if a person is real POI, there are only 50% chance that this identifier will recognize him or her. And if this identifier recognize a person to be POI, there are only 33% chance that this person is really a POI. Although the accuracy is not too bad (77%), this doesn't mean much for a highly skewed classification (much less POI compared with non-POI).
 
-The low efficiency are mostly due to limited samples and highly skewed class. There are about 140 samples with only less than 15% of people being POI, with this small amount of data, it tend to underfit. The train-test splitting is also challenging because there is a trade off between training error and testing error. Furthermore, the financial data is not completed, with a large amount of missing values. Last but not least, this dataset is not likely to be representative for all Enron employees. Since this dataset comes from top excutives in Enron, their financial status would be very different from regular Enron employees, and it is very likely that the percentage of POI from top excutives would be much higher than the percentage of POI from regular employees.
+The low efficiency are mostly due to limited samples and highly skewed class. There are about 140 samples with only less than 15% of people being POI, with this small amount of data, it tend to underfit. The train-test splitting is also challenging because there is a tradeoff between training error and testing error. Furthermore, the financial data is not completed, with a large amount of missing values. Last but not least, this dataset is not likely to be representative for all Enron employees. Since this dataset comes from top executives in Enron, their financial status would be very different from regular Enron employees, and it is very likely that the percentage of POI from top executives would be much higher than the percentage of POI from regular employees.
