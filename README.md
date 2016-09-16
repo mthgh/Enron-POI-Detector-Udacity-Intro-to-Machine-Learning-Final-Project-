@@ -236,23 +236,25 @@ sf3:
 CLF1:
 AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0, n_estimators=80, random_state=None)
 CLF2:
-AdaBoostClassifier(algorithm='SAMME.R', base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None, max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, presort=False, random_state=42, splitter='best'), learning_rate=1.0, n_estimators=100, random_state=42)
+AdaBoostClassifier(algorithm='SAMME.R', base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, presort=False,
+random_state=42, splitter='best'), learning_rate=1.0, n_estimators=100, random_state=42)
 
 classifier   accuracy   precision   recall       f1         f2     
  CLF1         0.854      0.607      0.355      0.448      0.387   
  CLF2         0.846      0.541      0.495      0.517      0.504   
 </pre>
 ## 7. Testing
-see code in ```final_test.py```
-
-In order to test the selected feature (sf3) and classifiers (CLF1, CLF2), the whole training set was trained by CLF1 or CLF2. After conducting predictions on the testing set, accuracy, precision, recall and f1 were obtained. The scores were shown below.
+In order to test the selected feature (sf3) and classifiers (CLF1, CLF2), the whole training set was trained by CLF1 or CLF2. After conducting predictions on the testing set, accuracy, precision, recall and f1 were obtained. The scores were shown below. (code is in ```final_test.py```)
 <pre>
 sf3:
 "poi", "bonus", "from_poi_to_this_person", "expenses", "exercised_stock_options", "total_stock_value" ("poi" is the label)
 CLF1:
 AdaBoostClassifier(algorithm='SAMME.R', base_estimator=None, learning_rate=1.0, n_estimators=80, random_state=None)
 CLF2:
-AdaBoostClassifier(algorithm='SAMME.R', base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None, max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, presort=False, random_state=42, splitter='best'), learning_rate=1.0, n_estimators=100, random_state=42)
+AdaBoostClassifier(algorithm='SAMME.R', base_estimator=DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+max_features=0.8, max_leaf_nodes=None, min_samples_leaf=1, min_samples_split=2, min_weight_fraction_leaf=0.0, presort=False,
+random_state=42, splitter='best'), learning_rate=1.0, n_estimators=100, random_state=42)
 
 Results on testing set:
  clf   accuracy   precision     recall        f1     
