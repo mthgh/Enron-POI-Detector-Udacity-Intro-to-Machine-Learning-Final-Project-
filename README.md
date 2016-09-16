@@ -61,8 +61,8 @@ Number of missing values for each feature in dataset:
 To check for outliers in financial data, all financial features were extracted from the dataset. Using dimension reduction (PCA), the multidimensional financial features were projected to two dimensions and the mapping was visualized (saved to 'figure_1.png'). 
 ![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_1.png)
 This visualization clearly indicate two outliers. A further exploration of the outliers revealed one is from "TOTAL" and the other is from financial data of "LAY KENNETH L". The formal outlier was removed as it was not a valid data point, whereas the latter was kept because it is a valid input, and it is actually coming from a "POI"  
-After removing the invalid data point, the outlier checking process was repeated (extract all financial features and apply PCA to project to two dimensions) and several more outliers were observed (saved to 'figure_2.png'), the new outliers were all valid financial data from 'HIRKO JOSEPH', 'RICE KENNETH D', 'SKILLING JEFFREY K' and 'PAI LOU L'. Therefore they are kept without change.
-![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_2.png)
+After removing the invalid data point, the outlier checking process was repeated (extract all financial features and apply PCA to project to two dimensions) and several more outliers were observed (saved to 'figure_2.png'), the new outliers were all valid financial data from 'HIRKO JOSEPH', 'RICE KENNETH D', 'SKILLING JEFFREY K' and 'PAI LOU L'. Therefore they are kept without change.  
+![alt tag](https://github.com/mthgh/Enron_POI_Detector/blob/master/figure_2.png)  
 The modified dataset were dumped into ```enron_dataset_modify.pkl```
 ## 5. Feature Selection
 ```feature_selection.py``` was used to select features used for POI identifier. 
